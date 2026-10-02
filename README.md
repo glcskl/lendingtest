@@ -1,106 +1,89 @@
-# WorkDo — лендинг
+# lendingtest — workdo landing
 
-**26 июня – 30 августа 2026, личный проект.** Задача: показать ERP-платформу управления бизнесом сразу нескольким вертикалям, не переписывая лендинг под каждую. Решение: **lendingtest** — Next.js 16 сайт, где общие блоки описаны данными, а вертикали получают собственные страницы, метаданные и адрес.
+A landing page for the workdo ERP platform that presents one product across several verticals without duplicating the page for each of them. The marketing copy, the sections and the vertical-specific content live in one place, and the routes are generated from that data.
 
----
+Built as a personal project between 26 June and 30 August 2026.
 
-## Что это
+## Features
 
-Лендинг ERP-платформы WorkDo: управление персоналом, объектами, финансами и отчётностью в одном окне. Репозиторий содержит только публичную часть — без авторизации и модулей.
+- One landing page reused by every vertical, driven by a single data module
+- Vertical-specific pages under `/verticals/[vertical]`, currently covering security services
+- Catch-all route that resolves slugs to page content
+- Pricing section rendered from data rather than markup
+- Motion handled centrally so animation behaviour stays consistent between sections
+- SEO support: generated robots file and sitemap
+- Minimal dependency footprint
 
-## Секции главной страницы
+## Tech stack
 
-| Секция | Содержание |
-|---|---|
-| **Герой** | «Управляйте бизнесом из одного окна» + кнопка «Попробовать бесплатно» |
-| **Платформа в цифрах** | 150+ решений · до 10 000 объектов и сотрудников · до 5 000 объектов · 99,9% Uptime |
-| **Возможности платформы** | Персонал, GPS-контроль, финансовый учёт, бизнес-аналитика, безопасность, API и интеграции |
-| **Преимущества** | Филиалы, мобильное приложение, 1С и банки, 7 лет развития |
-| **Данные под защитой** | Резервное копирование, изоляция, соответствие 152-ФЗ |
-| **Тарифы** | Тумблер «Месяц/Год −20%», 4 тарифа в BYN: Базовый 209, Стандарт 469, Бизнес 789, Премиум 1 239 |
-| **CTA** | Персональная демонстрация |
+| Layer | Technology |
+| --- | --- |
+| Framework | Next.js with App Router |
+| Language | TypeScript |
+| UI | React |
+| Animation | Framer Motion |
+| Icons | lucide-react |
+| Styling | Global CSS with PostCSS |
 
-Счётчики и появление текста сделаны на Framer Motion и локальных компонентах `Counter`, `RevealLine`, `RevealWords`, `MagneticLink`.
+## Getting started
 
-## Вертикали
+### Requirements
 
-Отдельные страницы под каждую вертикаль, каждая со своим `title` и `description`:
+- Node.js 20 or newer
+- npm or any compatible package manager
 
-- `/verticals/security` — автоматизация ЧОП: сотрудники, смены, объекты, патрули
-- `/[...slug]` — catch-all роут для всех секций и карточек, разметка берётся из `site-data.ts`
+### Environment variables
 
-Описание блоков лежит в `src/lib/site-data.ts` и используется одновременно для рендера и для `sitemap.ts` — страницы не разъезжаются с картой сайта.
+None. The project has no external services and no build-time secrets.
 
-## SEO
-
-- `metadataBase` и title/description по умолчанию в корневом `layout.tsx`
-- Отдельные метаданные на страницу вертикали — в её `layout.tsx`
-- `sitemap.ts` строится динамически из `SECTIONS` с приоритетами: главная 1.0, вертикаль 0.9, секции 0.8, карточки 0.7, `about` 0.6, `register` 0.5
-- `robots.ts` для управления индексацией
-- `canonical` и Open Graph на каждой странице
-
-## Запуск
-
-Требования: **Node.js 18+** и npm.
+### Installation
 
 ```bash
+git clone https://github.com/glcskl/lendingtest.git
+cd lendingtest
 npm install
+```
+
+### Running
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Production build and local run:
+
+```bash
 npm run build
-npm run start     # http://localhost:8000
+npm start
 ```
 
-Для разработки: `npm run dev` — http://localhost:3000
+The production server listens on port `8000`, so open `http://localhost:8000`.
 
-## Скрипты
-
-| Команда | Что делает |
-|---|---|
-| `npm run dev` | Режим разработки, порт 3000 |
-| `npm run build` | Продакшен-сборка |
-| `npm run start` | Запуск собранного сайта, порт 8000 |
-
-## Стек
-
-- **Next.js 16** — App Router, React Server Components
-- **React 19**
-- **Tailwind CSS v4** через PostCSS
-- **Framer Motion** — анимации
-- **lucide-react** — иконки
-- **TypeScript** в strict-режиме, алиас `@/*` → `./src/*`
-
-## Структура
+## Project structure
 
 ```
-lendingtest/
-├── next.config.ts
-├── postcss.config.mjs
-├── tsconfig.json
-└── src/
-    ├── app/
-    │   ├── layout.tsx              корневой layout, metadataBase, SEO по умолчанию
-    │   ├── page.tsx                главная страница
-    │   ├── globals.css             Tailwind и базовые стили
-    │   ├── sitemap.ts              карта сайта из SECTIONS
-    │   ├── robots.ts               правила индексации
-    │   ├── [...slug]/              catch-all: секции и карточки
-    │   └── verticals/security/     вертикаль ЧОП со своими метаданными
-    ├── components/
-    │   ├── Site.tsx                SiteHeader и SiteFooter
-    │   ├── motion.tsx              MagneticLink, константы REVEAL
-    │   └── pricing-section.tsx     тарифы с переключателем периода
-    └── lib/
-        └── site-data.ts            контент всех секций, единый источник правды
+src/app/
+  layout.tsx           root layout
+  page.tsx             main landing page
+  globals.css          global styles
+  robots.ts            generated robots.txt
+  sitemap.ts           generated sitemap
+  [...slug]/           catch-all page routes
+  verticals/security/  security services vertical
+src/components/
+  Site.tsx             shared site layout
+  motion.tsx           shared animation primitives
+  pricing-section.tsx  pricing block
+src/lib/
+  site-data.ts         all copy and content in one place
 ```
 
-## Известные ограничения
+## Content
 
-- **Кнопки ведут на `/register`, которого нет в репозитории.** В standalone-версии это 404. Настоящее приложение в этот репозиторий не входит.
-- **Тарифы и цифры зашиты в коде** в `site-data.ts` и компонентах — нет ни CMS, ни внешнего источника. Правка каждой цифры означает деплой.
-- **SEO-метаданные дублируются вручную** в корневом `layout.tsx` и в `layout.tsx` вертикали, общего шаблона нет.
-- **`[...slug]` — универсальный роут** без проверки существования секции. Некорректный путь, скорее всего, даст пустую страницу, а не 404.
-- **Тестов нет.**
-- **Лицензии нет.** Формально все права защищены.
+Everything a visitor reads comes from `src/lib/site-data.ts`. To change wording, add a vertical or reorder sections, edit that file rather than the components. The catch-all route picks up new slugs without new files.
 
-## Лицензия
+## Notes
 
-Файл `LICENSE` отсутствует. Формально все права защищены. Добавить лицензию — скажи, какой.
+This project is personal and is not affiliated with any of the companies whose verticals it presents.
